@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, status, HTTPException
 
 from data import data
-from models import Post
+from app.models import Post
 
 app = FastAPI()
 

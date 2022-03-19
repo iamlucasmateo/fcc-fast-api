@@ -1,0 +1,13 @@
+ENVIRONMENT: DEV
+REPOSITORY: POSTGRES
+
+DATABASE:
+  DEV:
+    CONNECTION:
+      user: postgres
+      password: postgres
+      host: localhost
+      port: 5432
+      database: fcc_fast_api
+    OTHER:
+      schema: main

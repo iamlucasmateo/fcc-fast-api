@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -6,5 +7,4 @@ from pydantic import BaseModel
 class Post(BaseModel):
     title: str
     content: str
-    edited: bool = False
-    share: Optional[bool] = True
+    published: bool = True
