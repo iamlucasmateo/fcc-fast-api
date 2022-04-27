@@ -4,13 +4,10 @@ from typing import Dict, Any, Optional, List, Iterable, Tuple
 from pydantic import BaseModel
 import psycopg2
 
-from app.utils.config import ConfigParser
-from app.models import Post
-from app.repository.general import Repository
-
-
-
-from app.utils.config import ConfigParser
+from src.utils.config import ConfigParser
+from src.models import Post
+from src.repository.general import Repository
+from src.utils.config import ConfigParser
 
 class PostRepository(Repository):
     @abstractmethod

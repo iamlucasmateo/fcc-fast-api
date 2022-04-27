@@ -1,8 +1,35 @@
-from fastapi import HTTPException, status
+from fastapi import FastAPI, Response, status, HTTPException
+import psycopg2
 
-from app.main import app, repository
-from app.repository.posts import PostRepository
-from app.models import Post
+from src.utils.config import ConfigParser
+from src.repository.posts import (
+    InMemoryPostRepository, PostgreSQLPostRepository, PostgresPostSQLQueries
+)
+
+from src.models import Post
+from src.main import repository
+from src.repository.posts import PostRepository
+
+
+
+app = FastAPI()
+
+# environment
+config = ConfigParser()
+env = config.get_env()
+selected_repository = config.get_data(paths=["REPOSITORY"])
+
+
+# select repository
+if selected_repository == 'POSTGRES':
+    connection_data = config.get_data(paths=["DATABASE", env, "CONNECTION"])
+    repository = PostgreSQLPostRepository(
+        connection_data=connection_data,
+        connection_handler=psycopg2,
+        queries=PostgresPostSQLQueries()
+    )
+else:
+    repository = InMemoryPostRepository()
 
 
 @app.get('/posts/')

@@ -1,9 +1,13 @@
 from fastapi import FastAPI, Response, status, HTTPException
 
 from data import data
-from app.models import Post
+from src.models import Post
 
 app = FastAPI()
+
+@app.get('/testing')
+async def get_all_posts():
+    return {"data": "here"}
 
 @app.get('/posts')
 async def get_all_posts():
