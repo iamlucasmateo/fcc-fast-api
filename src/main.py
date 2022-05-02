@@ -7,9 +7,6 @@ from src.repository.posts import (
 )
 
 from src.models import Post
-from src.main import repository
-from src.repository.posts import PostRepository
-
 
 
 app = FastAPI()
@@ -32,7 +29,7 @@ else:
     repository = InMemoryPostRepository()
 
 
-@app.get('/posts/')
+@app.get('/posts/', status_code=status.HTTP_201_CREATED)
 def read_all():
     data = repository.read_all()
     return data
@@ -54,9 +51,7 @@ def create(payload: Post):
 
 @app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete(id: int):
-    deleted = repository.delete(id)
-    if not deleted:
-        raise_inexistent(id)
+    repository.delete(id)
 
 
 @app.put('/posts/{id}')

@@ -1,0 +1,5 @@
+https://www.youtube.com/watch?v=0sOvCWFmrtA&t=6655s
+4:31 aprox (ORM)
+
+The main difference is that this option uses the repository pattern,
+and a query build inside the repository

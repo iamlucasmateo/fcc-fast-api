@@ -1,48 +1,48 @@
-from fastapi import HTTPException, status
+# from fastapi import HTTPException, status
 
-from src.main import app, repository
-from src.repository.posts import PostRepository
-from src.models import Post
-
-
-@app.get('/posts/')
-def read_all():
-    data = repository.read_all()
-    return data
+# from src.main import app, repository
+# from src.repository.posts import PostRepository
+# from src.models import Post
 
 
-@app.get('/posts/{id}')
-def read_one(id: int):
-    data = repository.read_one(id)
-    if not data:
-        raise_inexistent(id)
-    return data
+# @app.get('/posts/')
+# def read_all():
+#     data = repository.read_all()
+#     return data
 
 
-@app.post('/posts/')
-def create(payload: Post):
-    repository.create(payload)
-    return payload
+# @app.get('/posts/{id}')
+# def read_one(id: int):
+#     data = repository.read_one(id)
+#     if not data:
+#         raise_inexistent(id)
+#     return data
 
 
-@app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete(id: int):
-    deleted = repository.delete(id)
-    if not deleted:
-        raise_inexistent(id)
+# @app.post('/posts/')
+# def create(payload: Post):
+#     repository.create(payload)
+#     return payload
 
 
-@app.put('/posts/{id}')
-def update(id: int, payload: Post):
-    try:
-        repository.update(id, payload)
-        return payload
-    except KeyError as e:
-        raise_inexistent(id)
+# @app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
+# def delete(id: int):
+#     deleted = repository.delete(id)
+#     if not deleted:
+#         raise_inexistent(id)
 
 
-def raise_inexistent(id: int, status_code: int = status.HTTP_404_NOT_FOUND):
-    raise HTTPException(
-        status_code=status_code,
-        detail=f"id {id} does not exist for posts"
-    )
+# @app.put('/posts/{id}')
+# def update(id: int, payload: Post):
+#     try:
+#         repository.update(id, payload)
+#         return payload
+#     except KeyError as e:
+#         raise_inexistent(id)
+
+
+# def raise_inexistent(id: int, status_code: int = status.HTTP_404_NOT_FOUND):
+#     raise HTTPException(
+#         status_code=status_code,
+#         detail=f"id {id} does not exist for posts"
+#     )

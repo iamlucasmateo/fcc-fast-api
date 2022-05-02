@@ -96,7 +96,7 @@ class PostSQLQueries:
     def read_one(self):
         return f"SELECT * FROM {self.schema}.posts WHERE id = %s;"
     
-    def create(self, payload: Tuple[str]):
+    def create(self, payload: dict):
         placeholder = self.arr2string([f'%({col})s' for col in payload.keys()], 
                                       init='(', end=')',
                                       before='', after=', ')
@@ -107,6 +107,17 @@ class PostSQLQueries:
         cols = cols[:-3] + ')'
         query = f"INSERT INTO {self.schema}.posts {cols} VALUES {placeholder}"
         return query
+    
+    def update(self, payload: dict):
+        cols_for_update_query = [f'{col} = %s' for col in payload.keys()]
+        placeholder = self.arr2string(cols_for_update_query, after=', ')
+        placeholder = placeholder[:-2]
+        query = f"UPDATE {self.schema}.posts SET {placeholder} WHERE id = %s"
+        return query
+    
+    def delete(self):
+        return f"DELETE FROM {self.schema}.posts WHERE id = %s RETURNING *"
+
     
     @staticmethod
     def arr2string(arr: List[str], 
@@ -149,6 +160,8 @@ class PostgreSQLPostRepository(SQLPostRepository):
         query = self.queries.read_one()
         self.cursor.execute(query, (id,))
         values = self.cursor.fetchone()
+        if not values:
+            return None
         post_data = self.values2post(values)
         post = Post(**post_data)
         return post
@@ -156,7 +169,7 @@ class PostgreSQLPostRepository(SQLPostRepository):
     def values2post(self, values: Iterable[Any]):
         """Receives all values as iterable, returns data for creating Post"""
         post_data = { col: value for col, value in zip(self.cols, values) }
-        return Post(**post_data)
+        return post_data
     
     def read_all(self):
         """Returns all posts"""
@@ -166,15 +179,17 @@ class PostgreSQLPostRepository(SQLPostRepository):
         posts = (self.values2post(values) for values in data)
         return posts
 
-    def update(self, id: int, payload: Dict):
-        pass
+    def update(self, id: int, payload: Post):
+        query = self.queries.update(payload.dict())
+        values = tuple(list(payload.dict().values()) + [id])
+        updated = self.cursor.execute(query, values)
+        self.connection.commit()
+        return updated
     
     def create(self, payload: Post):
         """Creates post entry in Postgres DB"""
         query = self.queries.create(payload.dict())
         query_values = payload.dict()
-        print(query)
-        print(query_values)
         try:
             self.cursor.execute(query, query_values)
             self.connection.commit()
@@ -182,7 +197,11 @@ class PostgreSQLPostRepository(SQLPostRepository):
             print(e)
     
     def delete(self, id: int):
-        pass
+        query = self.queries.delete()
+        self.cursor.execute(query, (id,))
+        deleted_value = self.cursor.fetchone()
+        self.connection.commit()
+        return deleted_value
 
 
 # # connection

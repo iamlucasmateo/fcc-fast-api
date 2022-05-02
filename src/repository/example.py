@@ -1,6 +1,6 @@
 import psycopg2
 
-from app.utils.config import ConfigParser
+from src.utils.config import ConfigParser
 
 
 # connection
