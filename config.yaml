@@ -10,4 +10,4 @@ DATABASE:
       port: 5432
       database: fcc_fast_api
     OTHER:
-      schema: main
+      schema: public
