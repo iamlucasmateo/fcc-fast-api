@@ -1,4 +1,5 @@
-from curses.ascii import HT
+from typing import List
+
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 import psycopg2
 from sqlalchemy.orm import Session
@@ -7,7 +8,8 @@ from src.utils.config import ConfigParser
 from src.repository.posts import (
     InMemoryPostRepository, PostgreSQLPostRepository, PostgresPostSQLQueries
 )
-from src.models import PostSchema, Base, PostModel
+from src.schemas import PostBase, PostCreate, PostResponse
+from src.models import Base, PostModel
 from src.database import SessionLocal, engine
 
 # this will create the tables is they not exist, otherwise it will use them
@@ -41,27 +43,27 @@ else:
     repository = InMemoryPostRepository()
 
 
-@app.get('/posts/', status_code=status.HTTP_200_OK)
+@app.get('/posts/', status_code=status.HTTP_200_OK, response_model=List[PostResponse])
 def read_all(db: Session = Depends(get_db)): # using Depends makes testing easier (it's not necessary)
     # db.query returns a query
     posts = db.query(PostModel).all()
-    return { "data": posts }
+    return posts
 
 
-@app.get('/posts/{id}')
+@app.get('/posts/{id}', response_model=PostResponse)
 def read_one(id: int, db: Session = Depends(get_db)):
     post = db.query(PostModel).filter(PostModel.id == id).first()
-    return { "data": post }
+    return post
 
 
-@app.post('/posts/')
-def create(post: PostSchema, db: Session = Depends(get_db)):
+@app.post('/posts/', response_model=PostResponse)
+def create(post: PostCreate, db: Session = Depends(get_db)):
     # new_post = PostModel(title=post.title, content=post.content, published=post.published)
     new_post = PostModel(**post.dict()) # unpacking for shorted code
     db.add(new_post) # creates row in DB
     db.commit() # commits
     db.refresh(new_post) # retrieves results from DB
-    return { "data": new_post }
+    return new_post
 
 
 @app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
@@ -73,10 +75,8 @@ def delete(id: int, db: Session = Depends(get_db)):
     query.delete(synchronize_session=False)
     db.commit()
 
-
-
-@app.put('/posts/{id}')
-def update(id: int, payload: PostSchema, db: Session = Depends(get_db)):
+@app.put('/posts/{id}', response_model=PostResponse)
+def update(id: int, payload: PostCreate, db: Session = Depends(get_db)):
     post_query = db.query(PostModel).filter(PostModel.id == id)
     
     if post_query.first() == None:
@@ -84,12 +84,14 @@ def update(id: int, payload: PostSchema, db: Session = Depends(get_db)):
     
     post_query.update(payload.dict(), synchronize_session=False)
     db.commit()
+    post = db.refresh(post_query.first())
 
-    return {"data": "Successful"}
+    return post
 
 
 
 
+# Using repository
 @app.get('/repository/posts/', status_code=status.HTTP_200_OK)
 def read_all():
     data = repository.read_all()
@@ -105,7 +107,7 @@ def read_one(id: int):
 
 
 @app.post('/repository/posts/')
-def create(payload: PostSchema):
+def create(payload: PostCreate):
     repository.create(payload)
     return payload
 
@@ -116,7 +118,7 @@ def delete(id: int):
 
 
 @app.put('/repository/posts/{id}')
-def update(id: int, payload: PostSchema):
+def update(id: int, payload: PostCreate):
     try:
         repository.update(id, payload)
         return payload

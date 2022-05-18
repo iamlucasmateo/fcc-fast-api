@@ -5,13 +5,13 @@ from pydantic import BaseModel
 import psycopg2
 
 from src.utils.config import ConfigParser
-from src.models import PostSchema
+from src.schemas import PostBase, PostCreate
 from src.repository.general import Repository
 from src.utils.config import ConfigParser
 
 class PostRepository(Repository):
     @abstractmethod
-    def create(self, payload: PostSchema):
+    def create(self, payload: PostCreate):
         pass
 
     @abstractmethod
@@ -23,7 +23,7 @@ class PostRepository(Repository):
         pass
 
     @abstractmethod
-    def update(self, id: int, payload: PostSchema):
+    def update(self, id: int, payload: PostCreate):
         pass
 
     @abstractmethod
@@ -33,25 +33,25 @@ class PostRepository(Repository):
 
 class InMemoryPostRepository(PostRepository):
     init_data = {
-        1: PostSchema(
+        1: PostBase(
             title="My post", 
             content="Writing something",
             published=False
         ),
-        2: PostSchema(
+        2: PostBase(
             title = "Pizza",
             content = "I love pizza",
         ),
-        3: PostSchema(
+        3: PostBase(
             title = "Politics",
             content = "Sharing my opinion",
         )
     }
     
-    def __init__(self, data: Dict[int, PostSchema] = init_data) -> None:
+    def __init__(self, data: Dict[int, PostCreate] = init_data) -> None:
         self.data = data
 
-    def create(self, payload: PostSchema) -> PostSchema:
+    def create(self, payload: PostCreate) -> PostCreate:
         new_index = max(self.data.keys()) + 1
         self.data[new_index] = payload
         return payload
@@ -67,13 +67,13 @@ class InMemoryPostRepository(PostRepository):
         deleted = self.data.pop(id)
         return deleted
     
-    def update(self, id: int, payload: PostSchema):
+    def update(self, id: int, payload: PostCreate):
         if id not in self.data.keys():
             raise KeyError(f"id {id} does not exist in this database")
         # TODO: this should check if all keys are indicated in payload
         new_values = self.data[id].dict()
         new_values.update(payload.dict())
-        self.data[id] = PostSchema(**new_values)
+        self.data[id] = PostCreate(**new_values)
         return payload
 
 
@@ -163,7 +163,7 @@ class PostgreSQLPostRepository(SQLPostRepository):
         if not values:
             return None
         post_data = self.values2post(values)
-        post = PostSchema(**post_data)
+        post = PostBase(**post_data)
         return post
     
     def values2post(self, values: Iterable[Any]):
@@ -179,14 +179,14 @@ class PostgreSQLPostRepository(SQLPostRepository):
         posts = (self.values2post(values) for values in data)
         return posts
 
-    def update(self, id: int, payload: PostSchema):
+    def update(self, id: int, payload: PostCreate):
         query = self.queries.update(payload.dict())
         values = tuple(list(payload.dict().values()) + [id])
         updated = self.cursor.execute(query, values)
         self.connection.commit()
         return updated
     
-    def create(self, payload: PostSchema):
+    def create(self, payload: PostCreate):
         """Creates post entry in Postgres DB"""
         query = self.queries.create(payload.dict())
         query_values = payload.dict()

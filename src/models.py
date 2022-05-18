@@ -1,18 +1,9 @@
-from typing import Optional
-from datetime import datetime
-
-from pydantic import BaseModel
 from sqlalchemy import TIMESTAMP, Column, Integer, String, Boolean, text
 
 from src.database import Base
 
 
-class PostSchema(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-
-
+# ORM models are for the database
 class PostModel(Base):
     __tablename__ = "posts"
 
