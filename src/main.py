@@ -1,3 +1,4 @@
+from email.policy import HTTP
 from typing import List
 
 from fastapi import FastAPI, Response, status, HTTPException, Depends
@@ -8,9 +9,11 @@ from src.utils.config import ConfigParser
 from src.repository.posts import (
     InMemoryPostRepository, PostgreSQLPostRepository, PostgresPostSQLQueries
 )
-from src.schemas import PostBase, PostCreate, PostResponse
-from src.models import Base, PostModel
+from src.schemas import PostBase, PostCreate, PostResponse, UserCreate, UserResponse
+from src.models import Base, PostModel, User
 from src.database import SessionLocal, engine
+from src.utils.tools import hash
+
 
 # this will create the tables is they not exist, otherwise it will use them
 Base.metadata.create_all(bind=engine)
@@ -87,6 +90,29 @@ def update(id: int, payload: PostCreate, db: Session = Depends(get_db)):
     post = db.refresh(post_query.first())
 
     return post
+
+# Users
+
+@app.get("/users/{id}", response_model=UserResponse)
+def get_user(id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == id).first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    
+    return user
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    
+    # hash the password
+    user.password = hash(user.password)
+    
+    new_user = User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
 
 
 

@@ -1,5 +1,5 @@
 https://www.youtube.com/watch?v=0sOvCWFmrtA&t=6655s
-5:28 aprox (ORM vs Pydantic)
+6:18 aprox (routing)
 
 The main difference is that this option uses the repository pattern,
 and a query built inside said repository

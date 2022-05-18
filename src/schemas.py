@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 # pydantic models are for Requests and Responses
 # we could create one for each type of request, if we need different types of behavior
@@ -20,3 +20,14 @@ class PostResponse(PostBase):
 
     class Config:
         orm_mode = True
+
+
+class UserResponse(BaseModel):
+    email: EmailStr
+
+    class Config:
+        orm_mode = True
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
