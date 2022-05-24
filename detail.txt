@@ -1,5 +1,5 @@
 https://www.youtube.com/watch?v=0sOvCWFmrtA&t=6655s
-6:18 aprox (routing)
+7:13 aprox (verify that the token is valid)
 
 The main difference is that this option uses the repository pattern,
 and a query built inside said repository
