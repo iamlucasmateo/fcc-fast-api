@@ -26,10 +26,10 @@ def login(
     
     # Verify user against DB (hashed password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User or password incorrect")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User or password incorrect")
     
     if not verify(user_credentials.password, user.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User or password incorrect")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="User or password incorrect")
 
     # Create token; it can have whatever data the app needs
     token_data = { "user_id": user.id }
