@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from jose import jwt, JWTError
 
 from src.database import get_db
-from src.schemas import UserLogin
 from src.models import User
 from src.utils.tools import verify
 from src import oauth2
+from src.oauth2 import SECRET_KEY, ALGORITHM
+from src.schemas import Token
 
 
 router = APIRouter(
@@ -14,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.post("/login/")
+@router.post("/login/", response_model=Token)
 def login(
     user_credentials: OAuth2PasswordRequestForm = Depends(),  
     db: Session = Depends(get_db)
@@ -36,3 +38,18 @@ def login(
     access_token = oauth2.create_access_token(data=token_data)
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/full_auth")
+def decode_jwt(token: str):
+    # this is used as part of a dependency, but here is the explicit path
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]) 
+        id: str = payload.get("user_id")
+
+        if id is None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Id is none")
+
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="JWT decode error")
+    
+    return payload
