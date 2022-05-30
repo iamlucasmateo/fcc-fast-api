@@ -7,6 +7,8 @@ from src.repository.posts import (
 )
 from src.schemas import PostCreate
 
+# This was done before the Foreign Key restriction on the Post table
+
 router = APIRouter(
     prefix="/repository/posts",
     tags=["Repository"]

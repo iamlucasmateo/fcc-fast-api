@@ -14,22 +14,27 @@ router = APIRouter(
 )
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[PostResponse])
-def read_all(db: Session = Depends(get_db)): # using Depends makes testing easier (it's not necessary)
+def read_all(db: Session = Depends(get_db), current_user: int = Depends(get_current_user)): # using Depends makes testing easier (it's not necessary)
     # db.query returns a query
-    posts = db.query(PostModel).all()
+    # posts = db.query(PostModel).all() , all posts
+    posts = db.query(PostModel).filter(PostModel.user_id == current_user.id).all()
     return posts
 
 
 @router.get('/{id}', response_model=PostResponse)
-def read_one(id: int, db: Session = Depends(get_db)):
-    post = db.query(PostModel).filter(PostModel.id == id).first()
+def read_one(id: int, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+    post = db.query(PostModel).filter(
+        PostModel.id == id, PostModel.user_id == current_user.id
+    ).first()
     return post
 
 
 @router.post("/", response_model=PostResponse)
 def create(post: PostCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     # new_post = PostModel(title=post.title, content=post.content, published=post.published)
-    new_post = PostModel(**post.dict()) # unpacking for shorter code
+    post_data = post.dict()
+    post_data.update({"user_id": current_user.id})
+    new_post = PostModel(**post_data) # unpacking for shorter code
     db.add(new_post) # creates row in DB
     db.commit() # commits
     db.refresh(new_post) # retrieves results from DB
@@ -38,7 +43,9 @@ def create(post: PostCreate, db: Session = Depends(get_db), current_user: int = 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete(id: int, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
-    query = db.query(PostModel).filter(PostModel.id == id)
+    query = db.query(PostModel).filter(
+        PostModel.id == id, PostModel.user_id == current_user.id
+    )
     if query.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="post not found")
     
@@ -47,7 +54,9 @@ def delete(id: int, db: Session = Depends(get_db), current_user: int = Depends(g
 
 @router.put("/{id}", response_model=PostResponse)
 def update(id: int, payload: PostCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
-    post_query = db.query(PostModel).filter(PostModel.id == id)
+    post_query = db.query(PostModel).filter(
+        PostModel.id == id, PostModel.user_id == current_user.id
+    )
     
     if post_query.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error")
