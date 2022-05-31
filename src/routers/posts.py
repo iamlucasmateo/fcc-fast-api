@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm import Session
@@ -14,10 +14,17 @@ router = APIRouter(
 )
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[PostResponse])
-def read_all(db: Session = Depends(get_db), current_user: int = Depends(get_current_user)): # using Depends makes testing easier (it's not necessary)
+def read_all(
+    db: Session = Depends(get_db), 
+    current_user: int = Depends(get_current_user), 
+    limit: int = 10, 
+    skip: int = 0,
+    search: Optional[str] = ""
+
+): # using Depends makes testing easier (it's not necessary)
     # db.query returns a query
     # posts = db.query(PostModel).all() , all posts
-    posts = db.query(PostModel).filter(PostModel.user_id == current_user.id).all()
+    posts = db.query(PostModel).filter(PostModel.content.contains(search), PostModel.user_id == current_user.id).limit(limit).offset(skip).all()
     return posts
 
 
