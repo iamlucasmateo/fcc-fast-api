@@ -1,4 +1,4 @@
-from sqlalchemy import TIMESTAMP, Column, Integer, String, Boolean, text, ForeignKey
+from sqlalchemy import TIMESTAMP, Column, Integer, String, Boolean, text, ForeignKey, ForeignKeyConstraint
 
 from src.database import Base
 
@@ -24,3 +24,12 @@ class User(Base):
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+
+
+class UpDownVote(Base):
+    __tablename__ = "likes"
+
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True, nullable=False)
+    post_id = Column(Integer, ForeignKey("posts.id", ondelete="CASCADE"), primary_key=True,nullable=False)
+    upvote = Column(Boolean, server_default="TRUE", nullable=False)
+

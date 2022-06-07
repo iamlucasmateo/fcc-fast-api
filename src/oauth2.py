@@ -19,7 +19,7 @@ settings = get_settings()
 # 2. Token Algorithm
 # 3. Expiration time
 
-# to get something like these, on the command line: openssl rand -hex 32
+# to get something like this, on the command line: openssl rand -hex 32
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = int(settings.ACCESS_TOKEN_EXPIRE_MINUTES)

@@ -44,4 +44,10 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: Optional[str] 
+    id: Optional[str]
+
+
+class UpDownVote(BaseModel):
+    user_id: int
+    post_id: int
+    upvote: bool

@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from src.schemas import UserResponse, UserCreate
 from src.models import User
 from src.database import get_db
+from src.utils.tools import hash
 
 router = APIRouter(
     prefix="/users",
@@ -20,6 +21,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     
     return user
+
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
