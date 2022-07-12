@@ -1,5 +1,5 @@
 https://www.youtube.com/watch?v=0sOvCWFmrtA&t=6655s
-9:21 aprox (Voting)
+10:52 aprox (Voting)
 
 The main difference is that this option uses the repository pattern,
 and a query built inside said repository
