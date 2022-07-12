@@ -59,7 +59,7 @@ async def get_all_user_votes(
 
 
 @router.get("/{post_id}")
-async def get_all_user_votes(
+async def get_user_votes(
     post_id: int,
     db: Session = Depends(get_db)
 ):  

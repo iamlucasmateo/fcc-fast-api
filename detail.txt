@@ -3,3 +3,6 @@ https://www.youtube.com/watch?v=0sOvCWFmrtA&t=6655s
 
 The main difference is that this option uses the repository pattern,
 and a query built inside said repository
+
+e.g. user:
+user5@example.com / "string"
