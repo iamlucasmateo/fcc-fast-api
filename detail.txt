@@ -21,3 +21,5 @@ alembic upgrade [head, revision name]
 alembic downgrade [revision, -1]
 alembic current
 alembic heads
+alembic revision --autogenerate -m "revision detail"
+For autogenerate to work, you need to assign target_metadata = Base.metadata in alembic/env.py

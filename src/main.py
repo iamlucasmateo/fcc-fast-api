@@ -6,7 +6,9 @@ from src.routers import posts, user, repository, auth, likes
 
 
 # this will create the tables is they not exist, otherwise it will use them
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
+
+# with Alembic it's not neede anymore
 
 app = FastAPI()
 
