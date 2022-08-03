@@ -1,8 +1,23 @@
 https://www.youtube.com/watch?v=0sOvCWFmrtA&t=6655s
 10:52 aprox (Voting)
 
-The main difference is that this option uses the repository pattern,
-and a query built inside said repository
+Difference: option using a repository pattern, with queries builts inside said repository.
 
 e.g. user:
 user5@example.com / "string"
+
+load server:
+uvicorn src.main:app --reload
+
+source venv/bin/activate
+
+
+Alembic commands
+-----------------
+alembic revision -m "helpful comment about revision"
+(Always do both upgrade and downgrade)
+alembic history
+alembic upgrade [head, revision name]
+alembic downgrade [revision, -1]
+alembic current
+alembic heads
