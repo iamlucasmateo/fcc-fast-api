@@ -1,5 +1,5 @@
 https://www.youtube.com/watch?v=0sOvCWFmrtA&t=6655s
-11:41 aprox (Heroku setup)
+11:45 aprox (Heroku setup)
 
 Difference: option using a repository pattern, with queries builts inside said repository.
 
