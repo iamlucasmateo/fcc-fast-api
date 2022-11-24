@@ -7,7 +7,7 @@ from typing import List, Dict
 
 class ConfigParser:
 
-    DEFAULT_FILE_PATH ='/home/lucas-mateo/Desktop/CODE/learn/fcc-fast-api/config.yaml'
+    DEFAULT_FILE_PATH ='./config.yaml'
 
     def __init__(self, path: str = DEFAULT_FILE_PATH) -> None:
         self.config_path = path
@@ -28,8 +28,3 @@ class ConfigParser:
                 print(e)
                 raise KeyError(f"{path} does not exist as Key")
         return data
-
-
-if __name__ == '__main__':
-    print(ConfigParser().read_yaml())
-    print(ConfigParser().get_data(["DATABASE", "DEV"]))

@@ -23,3 +23,10 @@ alembic current
 alembic heads
 alembic revision --autogenerate -m "revision detail"
 For autogenerate to work, you need to assign target_metadata = Base.metadata in alembic/env.py
+
+
+MacOS: postgres
+---------------
+brew services start postgresql
+brew services stop postgresql
+psql postgres
